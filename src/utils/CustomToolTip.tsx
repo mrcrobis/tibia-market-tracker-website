@@ -52,9 +52,10 @@ var dateOptions: Intl.DateTimeFormatOptions = {hour12: true, year: "numeric", mo
 interface DynamicChartProps {
     timeGraph: CustomTimeGraph;
     isLightMode: boolean;
+    animate: boolean;
 }
 
-export const DynamicChart = ({timeGraph, isLightMode}: DynamicChartProps) => {
+export const DynamicChart = ({timeGraph, isLightMode, animate}: DynamicChartProps) => {
     if (!timeGraph.isWeekdayGraph) {
         var dynamicData: any[] = [];
 
@@ -66,6 +67,9 @@ export const DynamicChart = ({timeGraph, isLightMode}: DynamicChartProps) => {
 
             dynamicData.push(timeGraph.data[i].asDynamic());
         }
+
+        // Order the data by time.
+        dynamicData = dynamicData.sort((a, b) => a.time - b.time);
         
         var lines: any[] = [];
         // Add a line for every key in the dynamicData except for time and events.
@@ -75,7 +79,7 @@ export const DynamicChart = ({timeGraph, isLightMode}: DynamicChartProps) => {
                 var label = timeGraph.labels[key] ?? key;
                 var strokeDashArray = key.endsWith("Trend") ? "3 3" : undefined;
                 var activeDot = key.endsWith("Trend") ? false : true;
-                lines.push(<Line connectNulls key={key} name={label} type='monotone' dataKey={key} dot={false} activeDot={activeDot} stroke={colour} strokeDasharray={strokeDashArray} />);
+                lines.push(<Line isAnimationActive={animate} connectNulls key={key} name={label} type='monotone' dataKey={key} dot={false} activeDot={activeDot} stroke={colour} strokeDasharray={strokeDashArray} />);
             }
         });
         
@@ -141,7 +145,7 @@ export const DynamicChart = ({timeGraph, isLightMode}: DynamicChartProps) => {
                 var colour = timeGraph.colours[key] ?? "#82ca9d";
                 var label = timeGraph.labels[key] ?? key;
                 
-                bars.push(<Bar key={key} name={label} barSize={30} dataKey={key} fill={colour} />);
+                bars.push(<Bar isAnimationActive={animate} key={key} name={label} barSize={30} dataKey={key} fill={colour} />);
             }
         });
 
